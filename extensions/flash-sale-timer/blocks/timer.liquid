@@ -1,0 +1,57 @@
+{% comment %} 
+  Lấy dữ liệu từ Metafield (chúng ta sẽ thiết lập namespace là 'akira' và key là 'flash_sale')
+{% endcomment %}
+<p style="color: red;">Akira Flash Sale App</p>
+
+<p style="color: red;">Dữ liệu Metafield: {{ product.metafields.akira.flash_sale.value }}</p>
+{% assign sale_date = product.metafields.akira.flash_sale.value %}
+
+{% if sale_date %}
+<div class="flash-sale-container" 
+     data-end-date="{{ sale_date }}"
+     style="background: #fff3cd; color: #856404; padding: 15px; border: 1px solid #ffeeba; border-radius: 8px; margin: 20px 0; text-align: center;">
+  <p style="margin: 0 0 10px 0; font-size: 1.1em;">🔥 <strong>FLASH SALE KẾT THÚC SAU:</strong></p>
+  <div id="akira-countdown" style="font-family: monospace; font-size: 2em; font-weight: bold;">
+    00:00:00:00
+  </div>
+</div>
+
+<script>
+  (function() {
+    const countdownElement = document.getElementById('akira-countdown');
+    const endDate = new Date("{{ sale_date }}").getTime();
+
+    const timer = setInterval(function() {
+      const now = new Date().getTime();
+      const distance = endDate - now;
+
+      if (distance < 0) {
+        clearInterval(timer);
+        document.querySelector('.flash-sale-container').style.display = 'none';
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      countdownElement.innerHTML = 
+        (days > 0 ? days + "d " : "") + 
+        hours.toString().padStart(2, '0') + ":" + 
+        minutes.toString().padStart(2, '0') + ":" + 
+        seconds.toString().padStart(2, '0');
+    }, 1000);
+  })();
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Flash Sale Countdown",
+  "target": "section",
+  "settings": [
+    { "type": "product", "id": "product", "label": "Product", "autofill": true }
+  ]
+}
+{% endschema %}
